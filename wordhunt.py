@@ -36,7 +36,7 @@ matched_word_dict = {}
 trie = Trie()
 
 print("Ingesting dictionary...")
-with open("test.dict") as dictionary_file:
+with open("words.dict") as dictionary_file:
     for x in dictionary_file:
         trie.insert(x.lower().strip())
 print("Done!")
