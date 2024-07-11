@@ -1,45 +1,19 @@
 #!/usr/bin/env python3
 
 import itertools
-
-class TrieNode:
-    def __init__(self):
-        self.children = {}
-        self.word_end = False
-
-class Trie:
-    def __init__(self):
-        self.root = TrieNode()
-
-    def insert(self, word):
-        node = self.root
-
-        for char in word:
-            if char not in node.children:
-                node.children[char] = TrieNode()
-            node = node.children[char]
-
-        # only reached when nodes have been traversed all the way to the end
-        node.word_end = True
-
-    def node_for_prefix(self, prefix):
-        node = self.root
-
-        for char in prefix:
-            if char not in node.children:
-                return None
-            node = node.children[char]
-        return node
-
-matched_word_dict = {}
+from trie import Trie, TrieNode
 
 trie = Trie()
+matched_word_dict = {}
 
-print("Ingesting dictionary...")
-with open("words.dict") as dictionary_file:
-    for x in dictionary_file:
-        trie.insert(x.lower().strip())
-print("Done!")
+def ingest_dictionary():
+    global trie
+
+    print("Ingesting dictionary...")
+    with open("words.dict") as dictionary_file:
+        for x in dictionary_file:
+            trie.insert(x.lower().strip())
+    print("Done!")
 
 def matching_words(prefix):
     node = trie.node_for_prefix(prefix)
@@ -55,7 +29,7 @@ def matching_words(prefix):
 
     return True
 
-def solve_wordhunt_for_index(first_idx, second_idx, banned_idxs=None, prefix=''):
+def solve_wordhunt_for_index(array, first_idx, second_idx, banned_idxs=None, prefix=''):
     if banned_idxs is None:
         banned_idxs = set()
 
@@ -84,22 +58,12 @@ def solve_wordhunt_for_index(first_idx, second_idx, banned_idxs=None, prefix='')
             if (new_first_idx, new_second_idx) in banned_idxs:
                 continue
 
-            solve_wordhunt_for_index(new_first_idx, new_second_idx, banned_idxs.copy(), new_prefix)
+            solve_wordhunt_for_index(array, new_first_idx, new_second_idx, banned_idxs.copy(), new_prefix)
 
-def main():
-    get_board()
+def get_board_from_user():
+    print("Type each character seperated by a space, with each row seperated by a newline")
 
-    for i in range(0, len(array)):
-        for j in range(0, len(array[i])):
-            solve_wordhunt_for_index(i, j)
-
-    for length, words in sorted(matched_word_dict.items()):
-        words = set(words)
-        print(f"Words for count {length}: {words}\n")
-
-def get_board():
-    global array
-    array = []
+    word_array = []
 
     while True:
         try:
@@ -108,9 +72,23 @@ def get_board():
             break
 
         line_chars = line.strip().split()
-        array.append(line_chars)
+        word_array.append(line_chars)
 
-    print(array)
+    print("\n")
+    return word_array
+
+def main():
+    ingest_dictionary()
+
+    word_array = get_board_from_user()
+
+    for i in range(0, len(word_array)):
+        for j in range(0, len(word_array[i])):
+            solve_wordhunt_for_index(word_array, i, j)
+
+    for length, words in sorted(matched_word_dict.items()):
+        words = set(words)
+        print(f"Words for count {length}: {words}\n")
 
 if __name__ == "__main__":
     main()
