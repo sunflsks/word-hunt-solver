@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import itertools
-from trie import Trie, TrieNode
+from trie import TrieNode
 
-trie = Trie()
+root_node = TrieNode()
 matched_word_dict = {}
 
 def ingest_dictionary():
@@ -12,11 +12,11 @@ def ingest_dictionary():
     print("Ingesting dictionary...")
     with open("words.dict") as dictionary_file:
         for x in dictionary_file:
-            trie.insert(x.lower().strip())
+            root_node.insert(x.lower().strip())
     print("Done!")
 
 def matching_words(prefix):
-    node = trie.node_for_prefix(prefix)
+    node = root_node.node_for_prefix(prefix)
 
     if not node:
         return False
@@ -87,7 +87,7 @@ def main():
             solve_wordhunt_for_index(word_array, i, j)
 
     for length, words in sorted(matched_word_dict.items()):
-        words = set(words)
+        words = sorted(set(words))
         print(f"Words for count {length}: {words}\n")
 
 if __name__ == "__main__":
