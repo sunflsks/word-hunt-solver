@@ -37,10 +37,10 @@ def solve_wordhunt_for_index(array, first_idx, second_idx, banned_idxs=None, pre
     current_letter = array[first_idx][second_idx]
     new_prefix = prefix + current_letter
 
+    banned_idxs.append((first_idx, second_idx))
+
     if not matching_words(new_prefix, banned_idxs):
         return
-
-    banned_idxs.append((first_idx, second_idx))
 
     for i in range(-1, 2):
         for j in range(-1, 2):
@@ -80,14 +80,14 @@ def get_board_from_user():
 
 def print_output(word_array):
     for length, words in matched_word_dict.items():
-        words = sorted(set(words))
         if length < 5:
             words_only = {word[0] for word in words}
             print(f"Words for count {length}: {words_only}\n")
         else:
             print(f"Words for count {length}: \n")
 
-            for word in words:
+            deduplicated_words = dict(words).items()
+            for word in deduplicated_words:
                 print(f"{word[0]}:")
 
                 for i in range(0, len(word_array[0])):
