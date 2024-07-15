@@ -2,20 +2,21 @@
 
 import itertools
 from trie import TrieNode
+from common import ingest_dictionary
 
 root_node = TrieNode()
 matched_word_dict = {}
 
-def ingest_dictionary():
+def setup_trie():
     global trie
 
-    print("Ingesting dictionary...")
-    with open("words.dict") as dictionary_file:
-        for x in dictionary_file:
-            root_node.insert(x.lower().strip())
-    print("Done!")
+    print("Setting up trie...")
+    for x in ingest_dictionary():
+        root_node.insert(x.lower().strip())
 
-def matching_words(prefix):
+    print("Done with trie!")
+
+def matching_words(prefix, banned_idxs):
     node = root_node.node_for_prefix(prefix)
 
     if not node:
@@ -25,21 +26,21 @@ def matching_words(prefix):
         if len(prefix) not in matched_word_dict:
             matched_word_dict[len(prefix)] = []
 
-        matched_word_dict[len(prefix)].append(prefix)
+        matched_word_dict[len(prefix)].append((prefix, tuple(banned_idxs)))
 
     return True
 
 def solve_wordhunt_for_index(array, first_idx, second_idx, banned_idxs=None, prefix=''):
     if banned_idxs is None:
-        banned_idxs = set()
+        banned_idxs = []
 
     current_letter = array[first_idx][second_idx]
     new_prefix = prefix + current_letter
 
-    if not matching_words(new_prefix):
+    if not matching_words(new_prefix, banned_idxs):
         return
 
-    banned_idxs.add((first_idx, second_idx))
+    banned_idxs.append((first_idx, second_idx))
 
     for i in range(-1, 2):
         for j in range(-1, 2):
@@ -77,8 +78,33 @@ def get_board_from_user():
     print("\n")
     return word_array
 
+def print_output(word_array):
+    for length, words in matched_word_dict.items():
+        words = sorted(set(words))
+        if length < 5:
+            words_only = {word[0] for word in words}
+            print(f"Words for count {length}: {words_only}\n")
+        else:
+            print(f"Words for count {length}: \n")
+
+            for word in words:
+                print(f"{word[0]}:")
+
+                for i in range(0, len(word_array[0])):
+                    for j in range(0, len(word_array)):
+                        if (i, j) == word[1][0]:
+                            print("✅", end="")
+                        elif (i, j) in word[1]:
+                            print("🟩", end="")
+                        else:
+                            print("⬜", end="")
+                    print("")
+                print("\n\n")
+
+            
+
 def main():
-    ingest_dictionary()
+    setup_trie()
 
     word_array = get_board_from_user()
 
@@ -86,9 +112,7 @@ def main():
         for j in range(0, len(word_array[i])):
             solve_wordhunt_for_index(word_array, i, j)
 
-    for length, words in sorted(matched_word_dict.items()):
-        words = sorted(set(words))
-        print(f"Words for count {length}: {words}\n")
+    print_output(word_array)
 
 if __name__ == "__main__":
     main()
