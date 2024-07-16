@@ -40,5 +40,5 @@ def main():
         print(f"Matches for length {count}: {sorted(matches)}")
 
 
-
-main()
+if __name__ == "__main__":
+    main()

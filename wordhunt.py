@@ -79,7 +79,7 @@ def get_board_from_user():
     return word_array
 
 def print_output(word_array):
-    for length, words in matched_word_dict.items():
+    for length, words in sorted(matched_word_dict.items()):
         if length < 5:
             words_only = {word[0] for word in words}
             print(f"Words for count {length}: {words_only}\n")
@@ -93,9 +93,11 @@ def print_output(word_array):
                 for i in range(0, len(word_array[0])):
                     for j in range(0, len(word_array)):
                         if (i, j) == word[1][0]:
-                            print("✅", end="")
+                            print("🟢", end="")
+                        elif (i, j) == word[1][len(word[1]) - 1]:
+                            print("🏁", end="")
                         elif (i, j) in word[1]:
-                            print("🟩", end="")
+                            print("🟨", end="")
                         else:
                             print("⬜", end="")
                     print("")
